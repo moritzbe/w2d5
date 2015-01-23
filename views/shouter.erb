@@ -1,8 +1,38 @@
 <html>
   <body>
+    <h1>SHOUTER! The final Boss</h1>
+
+
+      <h3> Please create a user here: </h3>    
+      <form action="/" method="post">
+        Enter name 
+      <input name="name" /><br>
+        Enter handle: (It should not contain spaces, and be only characters in downcase)
+      <input name="handle" /><br>
+        Generate a random password (click submit)
+      <input type="submit" />
+    </form></a>
+    
     <p>
-      Here you can see the list of activists. There are currently <%= @user %>  
+    Here is your handle! Remember it! <%=@user.handle %>
+    </p> <p>
+    Here is your password! Remember it! <%=@user.password %>
     </p>
-    <h1> Here is the list of activists subscirbed </h1>
+
+
+
+
+    </p>
+    <a href="/login">Got to login page</a>
+    </p>
   </body>
 </html>
+
+
+
+
+
+ <!-- 
+
+#       <input type="checkbox" name="first_programming_experience" value = "Yes"/> or No <input type="checkbox" name="first_programming_experience" value = "False"/><br>  <%=@user.password %>
+ -->
