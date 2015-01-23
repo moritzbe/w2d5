@@ -24,27 +24,26 @@ class Shout < ActiveRecord::Base
 end
 
 get('/') do
-@user = User.last
+@user = User.all
    	erb(:shouter)
  end
 
 post('/') do 
 	@user = User.create(name: params[:name], handle: params[:handle], password: (0...20).map { (65 + rand(26)).chr }.join)
  	session[:userpassword] = @user.password
- 	redirect('/login')
+ 	redirect('/')
 end
 
 get('/login') do
 	@user = User.last
-   	if session[:userpassword] == @weirdo
+   	if session[:userpassword] == session[:realpassword]
    		redirect('/mainpage')
 	end
-
    	erb(:login)
  end
 
 post('/login') do 
-		@weirdo = params[:realpassword]
+		session[:realpassword] = params[:realpassword]
  	redirect('/login')
 end
 
@@ -56,7 +55,6 @@ get('/mainpage') do
 	else
 		@loginresult = "wrong password"
 	end
-
    	erb(:login)
  end
 
