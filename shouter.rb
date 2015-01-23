@@ -46,8 +46,10 @@ post('/loginpage') do
 end
 
 get('/showpassword') do
-	@password = @user.(session[:userid])
-   	erb(:login)
+	@password = session[:userpassword]
+	sleep(5)
+	redirect('/login')
+   	erb(:showpassword)
  end
 
 
