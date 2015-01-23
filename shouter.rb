@@ -25,28 +25,43 @@ end
 
 get('/') do
 @user = User.last
-session[:user] = @user.password
    	erb(:shouter)
  end
 
 post('/') do 
 	@user = User.create(name: params[:name], handle: params[:handle], password: (0...20).map { (65 + rand(26)).chr }.join)
- 	#p user.errors.full_messages
- 	redirect('/')
+ 	session[:userpassword] = @user.password
+ 	redirect('/login')
 end
 
 get('/login') do
-	session[:user]
-   	if session[:user] == params[:realpassword]
-		@success = "success"
+	@user = User.last
+   	if session[:userpassword] == @weirdo
+   		redirect('/mainpage')
 	end
 
    	erb(:login)
  end
 
 post('/login') do 
-		@password = params[:realpassword]
- 	redirect('/')
+		@weirdo = params[:realpassword]
+ 	redirect('/login')
 end
 
+
+get('/mainpage') do
+	@user = User.last
+   	if session[:user] == session[:realpassword]
+		@loginresult = "success"
+	else
+		@loginresult = "wrong password"
+	end
+
+   	erb(:login)
+ end
+
+post('/mainpage') do 
+		session[:realpassword] = params[:realpassword]
+ 	redirect('/login')
+end
 
