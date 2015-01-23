@@ -16,25 +16,23 @@ enable :sessions
 
 class User < ActiveRecord::Base
 	attr_reader(:user, :handle)
-  # your stuff h
 end
 
 class Shout < ActiveRecord::Base
-  # your stuff here
 end
 
 get('/') do
-@user = User.all
    	erb(:shouter)
  end
 
 post('/') do 
 	@user = User.create(name: params[:name], handle: params[:handle], password: (0...20).map { (65 + rand(26)).chr }.join)
  	session[:userpassword] = @user.password
- 	redirect('/')
+ 	session[:userid] = @user.id
+ 	redirect('/showpassword')
 end
 
-get('/login') do
+get('/loginpage') do
 	@user = User.last
    	if session[:userpassword] == session[:realpassword]
    		redirect('/mainpage')
@@ -42,24 +40,31 @@ get('/login') do
    	erb(:login)
  end
 
-post('/login') do 
-		session[:realpassword] = params[:realpassword]
- 	redirect('/login')
+post('/loginpage') do 
+ 		session[:realpassword] = params[:realpassword]
+  	redirect('/login')
 end
 
-
-get('/mainpage') do
-	@user = User.last
-   	if session[:user] == session[:realpassword]
-		@loginresult = "success"
-	else
-		@loginresult = "wrong password"
-	end
+get('/showpassword') do
+	@password = @user.(session[:userid])
    	erb(:login)
  end
 
-post('/mainpage') do 
-		session[:realpassword] = params[:realpassword]
- 	redirect('/login')
-end
+
+
+
+# get('/mainpage') do
+# 	@user = User.last
+#    	if session[:user] == session[:realpassword]
+# 		@loginresult = "success"
+# 	else
+# 		@loginresult = "wrong password"
+# 	end
+#    	erb(:login)
+#  end
+
+# post('/mainpage') do 
+# 		session[:realpassword] = params[:realpassword]
+#  	redirect('/login')
+# end
 
