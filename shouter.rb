@@ -8,7 +8,7 @@ ActiveRecord::Base.establish_connection(
   adapter: 'sqlite3',
   database: 'shouter.sqlite'
 )
-#I18n.enforce_available_locales = false 
+I18n.enforce_available_locales = false 
 
 set :port, 3000
 enable :sessions
@@ -42,14 +42,14 @@ get('/loginpage') do
 
 post('/loginpage') do 
  		session[:realpassword] = params[:realpassword]
-  	redirect('/login')
+  	redirect('/loginpage')
 end
 
 get('/showpassword') do
 	@password = session[:userpassword]
-	sleep(5)
-	redirect('/login')
    	erb(:showpassword)
+   	sleep(2)
+	redirect('/loginpage')
  end
 
 
