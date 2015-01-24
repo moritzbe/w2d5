@@ -15,58 +15,69 @@ enable :sessions
 
 
 class User < ActiveRecord::Base
-	attr_reader(:user, :handle)
+	has_many :shouts
+
+	def add_shout
+	 shout = Shout.new(user_id: session[:user], message: params[message], created_at: Time.now)
+	 shout.save
+	end
+
 end
 
 class Shout < ActiveRecord::Base
+	belongs_to :user
+
 end
+
+
+
 
 get('/') do
    	erb(:shouter)
  end
 
 post('/') do 
-	@user = User.create(name: params[:name], handle: params[:handle], password: (0...20).map { (65 + rand(26)).chr }.join)
- 	session[:userpassword] = @user.password
- 	session[:userid] = @user.id
+	user = User.create(name: params[:name], handle: params[:handle], password: (0...20).map { (65 + rand(26)).chr }.join)
+ 	session[:userpassword] = user.password
  	redirect('/showpassword')
 end
 
+get('/showpassword') do
+	@password = session[:userpassword]   	
+   	erb(:showpassword)
+end
+
 get('/loginpage') do
-	@user = User.last
-   	if session[:userpassword] == session[:realpassword]
-   		redirect('/mainpage')
-	end
-   	erb(:login)
+	@answer = session[:loginanswer]
+   	erb(:loginpage)
  end
 
 post('/loginpage') do 
- 		session[:realpassword] = params[:realpassword]
+	if User.where(:handle => "#{params[:handle]}").size >= 1
+		user = User.find_by(:handle => "#{params[:handle]}")
+ 		session[:user_id].id
+ 		if user.password == "#{params[:realpassword]}"
+ 		redirect('/mainpage')
+ 		else
+ 		session[:loginanswer] = "wrong password"
+  		redirect('/loginpage')
+  		end
+  	else
+   	session[:loginanswer] = "wrong user"
   	redirect('/loginpage')
+  	end
 end
 
-get('/showpassword') do
-	@password = session[:userpassword]
-   	erb(:showpassword)
-   	sleep(2)
-	redirect('/loginpage')
- end
 
 
+get('/mainpage') do
 
+    erb(:mainpage)
+end
 
-# get('/mainpage') do
-# 	@user = User.last
-#    	if session[:user] == session[:realpassword]
-# 		@loginresult = "success"
-# 	else
-# 		@loginresult = "wrong password"
-# 	end
-#    	erb(:login)
-#  end
+post('/mainpage') do 
+add_shout
 
-# post('/mainpage') do 
-# 		session[:realpassword] = params[:realpassword]
-#  	redirect('/login')
-# end
+end
+
 
