@@ -1,17 +1,15 @@
 <html>
   <body style="text-align: center">    
-      <form action="/mainpage" method="post">
-        Enter SHOUT
-      <input name="message" /><br>
-      <input type="submit" />
-
-<h2><%=@title%></h2>
+<h2>Here, all posts are displayed!</h2>
 
 <% @shouts.each do |shout| %>
   <p><b><%= shout.message %></b> <br> 
     by <%= @users.find(shout.user_id).handle %>,  Likes: <%= shout.likes %></p> <p> posted on <%= shout.created_at %> </p>
      <p>
-        <a href="/likes/<%=shout.id %>">Like!</a>
+        <form action="/likes" method="post">
+          <%shout.id%>
+        <input type="submit" value="like!"/>
+        </form>
       </p>
       <br>
       <br>

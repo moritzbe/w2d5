@@ -3,6 +3,7 @@ require 'active_record'
 require 'sinatra'
 require "sinatra/reloader" if development?
 require 'pp'
+require 'digest'
 
 ActiveRecord::Base.establish_connection(
   adapter: 'sqlite3',
@@ -16,17 +17,10 @@ enable :sessions
 
 class User < ActiveRecord::Base
 	has_many :shouts
-
-	def add_shout
-	 shout = Shout.new(user_id: session[:user], message: params[message], created_at: Time.now)
-	 shout.save
-	end
-
 end
 
 class Shout < ActiveRecord::Base
 	belongs_to :user
-
 end
 
 
@@ -53,31 +47,49 @@ get('/loginpage') do
  end
 
 post('/loginpage') do 
-	if User.where(:handle => "#{params[:handle]}").size >= 1
-		user = User.find_by(:handle => "#{params[:handle]}")
- 		session[:user_id].id
- 		if user.password == "#{params[:realpassword]}"
- 		redirect('/mainpage')
- 		else
- 		session[:loginanswer] = "wrong password"
-  		redirect('/loginpage')
-  		end
+	if User.where(:handle => "#{params[:handle]}").size > 0
+		@@user = User.find_by(:handle => "#{params[:handle]}")
+ 		session[:user_id] = @@user.id
+ 			if @@user.password == "#{params[:realpassword]}"
+ 			session[:loginanswer] = ""
+ 			redirect('/mainpage')
+ 			else
+ 			session[:loginanswer] = "wrong password"
+  			redirect('/loginpage')
+  			end
   	else
-   	session[:loginanswer] = "wrong user"
-  	redirect('/loginpage')
+   		session[:loginanswer] = "wrong user"
+  		redirect('/loginpage')
   	end
 end
 
 
 
 get('/mainpage') do
+	@shouts = Shout.all.reverse
+	@title = "Here are all shouts"
+	@users = User.all
 
     erb(:mainpage)
 end
 
-post('/mainpage') do 
-add_shout
-
+post('/mainpage') do
+	@shout = @@user.shouts.create(user_id: session[:user_id], message: params[:message], created_at: Time.now, likes: 0)
+redirect('/mainpage')
 end
+
+get("/likes/:shout_id") do
+	shout = Shout.find(params[:shout_id])
+	shout.update(likes: shout.likes + 1)
+redirect('/mainpage')
+end
+
+get("/best") do
+	@title = "Here are the top 5 shouts"
+	@shouts = Shout.all.order('likes desc').limit(5)
+	@users = User.all
+	erb(:mainpage)
+end
+
 
 
