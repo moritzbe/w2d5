@@ -69,7 +69,6 @@ get('/mainpage') do
 	@shouts = Shout.all.reverse
 	@title = "Here are all shouts"
 	@users = User.all
-
     erb(:mainpage)
 end
 
@@ -90,6 +89,20 @@ get("/best") do
 	@users = User.all
 	erb(:mainpage)
 end
+
+get("/:handle") do
+	@title = "Here are all posts from #{params[:handle]}"
+	@users = User.all
+	@shouts = Shout.where(user_id: @users.find_by(handle: "#{params[:handle]}").id)
+	erb(:mainpage)
+end
+
+
+
+
+
+
+
 
 
 
